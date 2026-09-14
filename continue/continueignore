@@ -1,0 +1,41 @@
+# Build output and IDE state
+**/bin/**
+**/obj/**
+**/.vs/**
+**/.vscode/**
+**/.idea/**
+
+# Dependency and package caches
+**/node_modules/**
+**/packages/**
+**/.nuget/**
+**/.pnpm-store/**
+
+# Generated/minified browser assets; authored CSS and JavaScript remain indexed
+**/*.min.js
+**/*.min.css
+**/*.map
+**/wwwroot/lib/**
+**/wwwroot/vendor/**
+
+# Generated C# and temporary files
+**/*.g.cs
+**/*.generated.cs
+**/*.designer.cs
+**/*.tmp
+**/*.temp
+
+# Local secrets and credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/secrets.json
+**/appsettings.*.local.json
+**/*.pfx
+**/*.p12
+**/*.key
+
+# Source control metadata
+**/.git/**
+**/$tf/**
+**/.tfignore

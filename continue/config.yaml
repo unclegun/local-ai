@@ -1,0 +1,80 @@
+name: Local Copilot Lite
+version: 2.0.0
+schema: v1
+
+models:
+  - name: Local Project Assistant
+    provider: ollama
+    model: qwen3:8b
+    apiBase: http://127.0.0.1:11434
+    roles:
+      - chat
+      - edit
+      - apply
+    capabilities:
+      - tool_use
+    defaultCompletionOptions:
+      contextLength: 8192
+      maxTokens: 1024
+      temperature: 0
+      reasoning: false
+    requestOptions:
+      timeout: 600000
+
+  - name: Local Fast Autocomplete
+    provider: ollama
+    model: qwen2.5-coder:1.5b-base
+    apiBase: http://127.0.0.1:11434
+    roles:
+      - autocomplete
+    defaultCompletionOptions:
+      contextLength: 4096
+      maxTokens: 128
+      temperature: 0
+    autocompleteOptions:
+      debounceDelay: 350
+      maxPromptTokens: 2048
+      modelTimeout: 15000
+      onlyMyCode: true
+      useCache: true
+      useImports: true
+      useRecentlyEdited: true
+      useRecentlyOpened: true
+
+  - name: Local Codebase Embeddings
+    provider: ollama
+    model: nomic-embed-text
+    apiBase: http://127.0.0.1:11434
+    roles:
+      - embed
+    embedOptions:
+      maxChunkSize: 512
+      maxBatchSize: 16
+
+context:
+  - provider: currentFile
+  - provider: file
+  - provider: code
+  - provider: open
+  - provider: tree
+  - provider: repo-map
+    params:
+      includeSignatures: true
+  - provider: problems
+  - provider: codebase
+    params:
+      nRetrieve: 12
+      nFinal: 6
+      useReranking: false
+
+rules:
+  - Use only source and project context available through the IDE. Do not use external network resources.
+  - The open VS Code workspace is the repository root. When using the ls tool, start with dirPath ".". Never use example or placeholder paths such as "/path/to/folder". Use paths returned by ls, search, or IDE context for later tool calls.
+  - For repository questions, inspect the file tree, entry points, project files, configuration, and relevant implementations before answering. Do not infer behavior from filenames alone. Cite the workspace paths that support the answer.
+  - State facts directly and distinguish any necessary inference. If required context is absent, say exactly what is missing. Never invent files, APIs, behavior, conventions, or completed validation.
+  - In Plan mode, inspect and explain only. Do not modify files or run commands that change the workspace.
+  - For coding tasks, first locate related implementations and follow the repository's established language, framework, naming, formatting, architecture, and error-handling conventions.
+  - Produce the smallest complete change that satisfies the request. Generated code must compile in the observed project context and must not contain placeholders, omitted sections, speculative abstractions, unrelated refactors, or duplicate helpers.
+  - Check affected code for correctness, nullability, async behavior, cancellation, resource disposal, error handling, security, and boundary cases when relevant. Do not add defensive code without a concrete failure mode.
+  - Keep responses concise. Lead with the result, show code or a patch when requested, cite affected paths, and mention only material assumptions or validation. Avoid emojis, generic introductions, repeated summaries, and unsolicited next-step menus.
+  - Treat authentication, authorization, access control, secrets, data persistence, and input handling as security-sensitive. Preserve observed behavior unless the request explicitly changes it, and explain material security changes.
